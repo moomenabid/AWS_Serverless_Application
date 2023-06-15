@@ -13,7 +13,7 @@ This project consists of 6 stages :
 - STAGE 8 : Test functionality
 - STAGE 9 : Cleanup the account
 
-Before starting, we need to be sure that we are logged into an AWS account, have admin privileges and are in the `us-east-1` / `N. Virginia` Region.
+Before starting, we need to be sure that we are logged into an AWS account, have admin privileges and are in the `us-east-1` / `N. Virginia` Region.  
 Here is terraform code
 ```terraform
 provider "aws" {
