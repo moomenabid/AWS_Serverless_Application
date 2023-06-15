@@ -43,7 +43,7 @@ resource "aws_ses_email_identity" "moomenabid97trainee" {
 }
 ```
 # STAGE 2 : Add a email lambda function to use SES to send emails for the serverless application
-## STAGE 2A - CREATE THE Lambda Execution Role for Lambda
+## STAGE 2A - Create the Lambda Execution Role for Lambda
 In this stage, we need to create an IAM role which the email_reminder_lambda function will use to interact with other AWS services.
 ```terraform
 #1 Create execution role for the lamda function
@@ -165,5 +165,80 @@ resource "aws_lambda_function" "email_reminder_lambda" {
   runtime = "python3.9"
 }
 ```
-## STAGE 2 - FINISH   
-At this point you have configured the lambda function which will be used eventually to send emails on behalf of the serverless application.    
+## STAGE 2 - Finish   
+At this point you have configured the lambda function which will be used eventually to send emails on behalf of the serverless application. 
+# STAGE 3 : Implement and configure the state machine, the core of the application
+## STAGE 3A - Create the state machine's role
+In this stage we need to create an IAM role which the state machine will use to interact with other AWS services.  
+```terraform
+#3 Implement the state machine
+
+#### Create role for state machine
+
+######## Assume role policy
+data "aws_iam_policy_document" "state_machine_assume_role_policy" {
+  statement {
+    effect = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["states.amazonaws.com"]
+    }
+
+
+  }
+}
+
+######## Managed policies
+resource "aws_iam_policy" "cloudwatchlogs_state_machine" {
+  name = "cloudwatchlogs_state_machine"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = [
+          "logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents",
+          "logs:CreateLogDelivery", "logs:GetLogDelivery", "logs:UpdateLogDelivery",
+          "logs:DeleteLogDelivery", "logs:ListLogDeliveries", "logs:PutResourcePolicy",
+          "logs:DescribeResourcePolicies", "logs:DescribeLogGroups"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy" "invokelambdasandsendsns" {
+  name = "invokelambdasandsendsns"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = ["lambda:InvokeFunction", "sns:*"]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+######## state machine role
+resource "aws_iam_role" "state_machine_role" {
+  name                = "state_machine_role"
+  assume_role_policy  = data.aws_iam_policy_document.state_machine_assume_role_policy.json
+  managed_policy_arns = [aws_iam_policy.cloudwatchlogs_state_machine.arn, aws_iam_policy.invokelambdasandsendsns.arn]
+}
+
+```
+
+If we move to the IAM Console https://console.aws.amazon.com/iam/home?#/roles and review the state machine role, we can see that it gives 
+- logging permissions
+- the ability to invoke the email lambda function when it needs to send emails
+- the ability to use SNS to send text messages
+
+## STAGE 3B - Create the state machine
+
