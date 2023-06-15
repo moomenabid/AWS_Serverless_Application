@@ -15,5 +15,5 @@ This project consists of 6 stages :
 Before starting, we need to be sure that we are logged into an AWS account, have admin privileges and are in the `us-east-1` / `N. Virginia` Region
 
 # STAGE 1 - Configure Simple Email service (SES)
-The Gym Instructions application is going to send reminder messages via Email.  It will use the simple email service or SES. In production, it will be configured to allow sending from the application email, to any users of the application.  
+The Gym Instructions application is going to send reminder messages via Email. It will use the simple email service or SES. In production, it will be configured to allow sending from the application email, to any users of the application.  
 In order to be able to send to/from an email address, we need to verify that said address.
