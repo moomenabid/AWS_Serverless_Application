@@ -1,5 +1,5 @@
 # AWS Serverless Application
-In this project we are going to implement a simple serverless application using **S3**, **API Gateway** , **Lambda** , **Step Functions**  and ** SES** .  
+In this project we are going to implement a simple serverless application using **S3**, **API Gateway** , **Lambda** , **Step Functions**  and **SES** .  
 The serverless application has been created mainly using **aws**  and **python** .  
 The serverless application has been automated using **Terraform** .  
 The goal of the serverless application is to enable our trainer to send us training instructions in order to guide us through our muscle gaining journey.
