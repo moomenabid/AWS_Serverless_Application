@@ -241,4 +241,45 @@ If we move to the IAM Console https://console.aws.amazon.com/iam/home?#/roles an
 - the ability to use SNS to send text messages
 
 ## STAGE 3B - Create the state machine
+The state machine will control the flow through the serverless application.. once stated it will coordinate other AWS services as required.  
+Here is what the state machine is going to do
+- The state machine starts
+- Then waits for a certain time period based on the `Timer` state (This is controlled by the web front end which we will deploy soon)
+- Then the `email_lambda_function` is invoked which sends an email reminder  
+Here is the terraform code we used to deploy the state machine
+```terraform
+######## Create state machine
+resource "aws_sfn_state_machine" "MyStateMachine" {
+  name     = "MyStateMachine"
+  role_arn = aws_iam_role.state_machine_role.arn
 
+  definition = <<EOF
+{
+  "Comment": "A Hello World example of the Amazon States Language using an AWS Lambda Function",
+  "StartAt": "Timer",
+  "States": {
+    "Timer": {
+      "Type": "Wait",
+      "SecondsPath": "$.waitSeconds",
+      "Next": "Email"
+    },
+    "Email": {
+      "Type" : "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${aws_lambda_function.email_reminder_lambda.arn}",
+        "Payload": {
+          "Input.$": "$"
+        }
+      },
+      "Next": "NextState"
+    },
+    "NextState": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}
+EOF
+}
+```
