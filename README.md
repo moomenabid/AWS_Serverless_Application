@@ -9,8 +9,8 @@ This project consists of 6 stages :
 - STAGE 2 : Add a email lambda function to use SES to send emails for the serverless application 
 - STAGE 3 : Implement and configure the state machine, the core of the application
 - STAGE 4 : Implement the supporting lambda function for the API Gateway
-- STAGE 5 : Implement the S3 bucket 
-- STAGE 6 : Create the API Gateway 
+- STAGE 5 : Create the API Gateway  
+- STAGE 6 : Implement the S3 bucket 
 - STAGE 7 : Import the static frontend application to the S3 bucket
 - STAGE 8 : Test functionality
 - STAGE 9 : Cleanup the account
@@ -141,12 +141,12 @@ def lambda_handler(event, context):
     )
     return 'Success!'
 ```
-What this functio does is that it will send an email to an address it's supplied with (by step functions) and it will be FROM the email address we specified in the variable FROM_EMAIL_ADDRESS.
+What this function does is that it will send an email to an address it's supplied with (by step functions) and it will be FROM the email address we specified in the variable FROM_EMAIL_ADDRESS.
 
-Finally, we deployed the function, then we downloaded it's zip package and finally we deleted it because we will be creating it automatically with terraform using the downloaded zip package.
+Finally, we deployed the function, then we downloaded it's zip package `email_reminder_lambda.zip` and finally we deleted it because we will be creating it automatically with terraform using the downloaded zip package.
 
 ## STAGE 2C - Create the email_reminder_lambda function
-Once the zip package is downloaded, we deploy the email_reminder_lambda function using the following terraform code.
+Once the zip package `email_reminder_lambda.zip` is downloaded, we deploy the email_reminder_lambda function using the following terraform code.
 ```terraform
 #2 Create the lambda function
 resource "aws_lambda_function" "email_reminder_lambda" {
@@ -286,3 +286,92 @@ EOF
 ## STAGE 3 - FINISH
 At this point we have configured the state machine which is the core part of the serverless application.  
 The state machine controls the flow through the application and is responsible for interacting with other AWS products and services.  
+
+# STAGE 4 : Implement the supporting lambda function for the API Gateway
+From now on, we will be creating the front end API for the serverless application.  
+The front end loads from S3, runs in a browser and communicates with this API.  
+It uses API Gateway for the API Endpoint, and this uses Lambda to provide the backing compute.  
+First we will create the supporting `API_LAMBDA` and then the `API Gateway`  
+## STAGE 4A : Create the python zip package to be executed by the api_lambda function
+First, we need to create the python zip package to be executed by the api_lambda function  
+We need to do this step manually, we will afterwards download the zip package and use to create the lambda function automatically with terraform.
+
+In order to do so, we need to: 
+Move to the Lambda console https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions  
+Click on `Create Function`  
+for `Function Name` use `api_lambda`  
+for `Runtime` use `Python 3.9`  
+Expand `Change default execution role`  
+Select `Use an existing role`  
+Choose the `lambda_role` from the dropdown  
+Click `Create Function`  
+
+Then, we scrolled down to `Function code` and in the `lambda_function` code box, we wrote this code
+```python
+import boto3, json, os, decimal
+
+#Getting state machine arn
+sm = boto3.client('stepfunctions')
+sm_list_response = sm.list_state_machines()
+sm_list = sm_list_response['stateMachines']
+
+sm_target = {}
+for e in sm_list:
+    if e["name"] == "MyStateMachine":
+        sm_target = e.copy()
+        break
+
+SM_ARN = sm_target['stateMachineArn']
+
+def lambda_handler(event, context):
+    # Print event data to logs .. 
+    print("Received event: " + json.dumps(event))
+
+    # Load data coming from APIGateway
+    data = json.loads(event['body'])
+    data['waitSeconds'] = int(data['waitSeconds'])
+    
+    # Sanity check that all of the parameters we need have come through from API gateway
+    checks = []
+    checks.append('waitSeconds' in data)
+    checks.append(type(data['waitSeconds']) == int)
+    checks.append('message' in data)
+
+    # if any checks fail, return error to API Gateway to return to client
+    if False in checks:
+        response = {
+            "statusCode": 400,
+            "headers": {"Access-Control-Allow-Origin":"*"},
+            "body": json.dumps( { "Status": "Success", "Reason": "Input failed validation" })
+        }
+    # If none, start the state machine execution and inform client of 2XX success :)
+    else: 
+        sm.start_execution( stateMachineArn=SM_ARN, input=json.dumps(data) )
+        response = {
+            "statusCode": 200,
+            "headers": {"Access-Control-Allow-Origin":"*"},
+            "body": json.dumps( {"Status": "Success"})
+        }
+    return response
+```
+This is the lambda function which will support the API Gateway  
+It's job is to be called by API Gateway when its used by the serverless front end part of the application (loaded by S3), It accepts some information from you, via API Gateway and then it starts a state machine execution - which is the logic of the application.
+
+Finally, we deployed the function, then we downloaded it's zip package `api_lambda.zip` and finally we deleted it because we will be creating it automatically with terraform using the downloaded zip package.
+
+## STAGE 4B : Create the api_lambda function
+Once the zip package `api_lambda.zip` is downloaded, we deploy automatically the api_lambda function using the following terraform code.
+```terraform
+#4 Create the api lambda function
+resource "aws_lambda_function" "api_lambda" {
+  filename      = "C:\\Users\\user\\Desktop\\project_serverless\\api_lambda.zip"
+  function_name = "api_lambda"
+  role          = aws_iam_role.lambda_role.arn
+  handler       = "lambda_function.lambda_handler"
+  runtime = "python3.9"
+  depends_on = [aws_sfn_state_machine.MyStateMachine]
+}
+```
+# STAGE 5 : Create the API Gateway
+
+
