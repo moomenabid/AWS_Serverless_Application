@@ -120,7 +120,7 @@ Pick to `Use an existing Role`
 Click the `Existing Role` dropdown and pick `lambda_role` 
 Click `Create Function`  
 
-Finally, we scrolled down to `Function code` and in the `lambda_function` code box, we wrote this code
+Then, we scrolled down to `Function code` and in the `lambda_function` code box, we wrote this code
 ```python
 import boto3, os, json
 
@@ -141,5 +141,29 @@ def lambda_handler(event, context):
     )
     return 'Success!'
 ```
+What this functio does is that it will send an email to an address it's supplied with (by step functions) and it will be FROM the email address we specified in the variable FROM_EMAIL_ADDRESS.
 
+Finally, we deployed the function, then we downloaded it's zip package and finally we deleted it because we will be creating it automatically with terraform using the downloaded zip package.
 
+# STAGE 2C - Create the email_reminder_lambda function
+Once the zip package is downloaded, we deploy the email_reminder_lambda function using the following terraform code.
+```terraform
+#2 Create the lambda function
+resource "aws_lambda_function" "email_reminder_lambda" {
+  filename      = "C:\\Users\\user\\Desktop\\project_serverless\\email_reminder_lambda.zip"
+  function_name = "email_reminder_lambda"
+  role          = aws_iam_role.lambda_role.arn
+  # The field handler is very important, in terraform documentation it is said that it should be "The function entrypoint in your code" 
+  # Dont be mistaken, the value of the handler is not only the name of the function, It should be instead comprised of:
+  # -The name of the file in which the Lambda handler function is located
+  # -The name of the Python handler function
+  # The following field will generate this error message when invoking the lambda function => "Bad handler 'lambda_handler': not enough values to unpack (expected 2, got 1)"
+  # handler       = "lambda_handler"
+  # Solution discussed on this thread https://stackoverflow.com/questions/69780574/why-do-i-get-a-bad-handler-aws-lambda-not-enough-values-to-unpack-error
+  # Credit goes to Ermiya Eskandary :)
+  handler       = "lambda_function.lambda_handler" 
+  runtime = "python3.9"
+}
+```
+## STAGE 2 - FINISH   
+At this point you have configured the lambda function which will be used eventually to send emails on behalf of the serverless application.    
