@@ -43,7 +43,7 @@ resource "aws_ses_email_identity" "moomenabid97trainee" {
 }
 ```
 # STAGE 2 : Add a email lambda function to use SES to send emails for the serverless application
-### STAGE 2A - CREATE THE Lambda Execution Role for Lambda
+## STAGE 2A - CREATE THE Lambda Execution Role for Lambda
 In this stage, we need to create an IAM role which the email_reminder_lambda function will use to interact with other AWS services.
 ```terraform
 #1 Create execution role for the lamda function
@@ -105,7 +105,7 @@ This role is what gives lambda the permissions to interact with those services.
 
 Next we are going to create the lambda function which will be used by the serverless application to create an email and then send it using `SES`
 
-# STAGE 2B - Create the python zip package to be executed by the email_reminder_lambda function
+## STAGE 2B - Create the python zip package to be executed by the email_reminder_lambda function
 First, we need tp create the python zip package to be executed by the email_reminder_lambda function  
 We need to do this step manually, we will afterwards download the zip package and use to create the lambda function automatically with terraform.
 
@@ -145,7 +145,7 @@ What this functio does is that it will send an email to an address it's supplied
 
 Finally, we deployed the function, then we downloaded it's zip package and finally we deleted it because we will be creating it automatically with terraform using the downloaded zip package.
 
-# STAGE 2C - Create the email_reminder_lambda function
+## STAGE 2C - Create the email_reminder_lambda function
 Once the zip package is downloaded, we deploy the email_reminder_lambda function using the following terraform code.
 ```terraform
 #2 Create the lambda function
