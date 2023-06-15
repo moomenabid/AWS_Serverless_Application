@@ -42,11 +42,104 @@ resource "aws_ses_email_identity" "moomenabid97trainee" {
   email = "moomenabid97+trainee@gmail.com"
 }
 ```
+# STAGE 2 : Add a email lambda function to use SES to send emails for the serverless application
+### STAGE 2A - CREATE THE Lambda Execution Role for Lambda
+In this stage, we need to create an IAM role which the email_reminder_lambda function will use to interact with other AWS services.
+```terraform
+#1 Create execution role for the lamda function
+#### Assume role policy
+data "aws_iam_policy_document" "lambda_assume_role_policy" {
+  statement {
+    effect = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
 
 
+  }
+}
 
+#### Managed policies
+resource "aws_iam_policy" "cloudwatchlogs" {
+  name = "cloudwatchlogs"
 
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+        Effect   = "Allow"
+        Resource = "arn:aws:logs:*:*:*"
+      },
+    ]
+  })
+}
 
+resource "aws_iam_policy" "snsandsespermissions" {
+  name = "snsandsespermissions"
 
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = ["ses:*", "sns:*", "states:*"]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+#### Lambda execution role
+resource "aws_iam_role" "lambda_role" {
+  name                = "lambda_role"
+  assume_role_policy  = data.aws_iam_policy_document.lambda_assume_role_policy.json
+  managed_policy_arns = [aws_iam_policy.cloudwatchlogs.arn, aws_iam_policy.snsandsespermissions.arn]
+}
+```
+Now we have an execution role that provides SES, SNS and Logging permissions to whatever assumes this role.  
+This role is what gives lambda the permissions to interact with those services.
+
+Next we are going to create the lambda function which will be used by the serverless application to create an email and then send it using `SES`
+
+# STAGE 2B - Create the python zip package to be executed by the email_reminder_lambda function
+First, we need tp create the python zip package to be executed by the email_reminder_lambda function  
+We need to do this step manually, we will afterwards download the zip package and use to create the lambda function automatically with terraform.
+
+In order to do so, we need to:  
+Move to the lambda console https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions  
+Click on `Create Function`  
+Select `Author from scratch`  
+For `Function name` enter `email_reminder_lambda`  
+and for runtime click the dropdown and pick `Python 3.9`  
+Expand `Change default execution role`  
+Pick to `Use an existing Role`  
+Click the `Existing Role` dropdown and pick `lambda_role` 
+Click `Create Function`  
+
+Finally, we scrolled down to `Function code` and in the `lambda_function` code box, we wrote this code
+```python
+import boto3, os, json
+
+FROM_EMAIL_ADDRESS = 'moomenabid97+trainer@gmail.com'
+
+ses = boto3.client('ses')
+
+def lambda_handler(event, context):
+    # Print event data to logs .. 
+    print("Received event: " + json.dumps(event))
+    
+    ses.send_email( 
+        Source=FROM_EMAIL_ADDRESS,
+        Destination={ 'ToAddresses': [ event['Input']['email'] ] }, 
+        Message={ 'Subject': {'Data': 'Your trainer demands your attention!'},
+            'Body': {'Text': {'Data': event['Input']['message']}}
+        }
+    )
+    return 'Success!'
+```
 
 
