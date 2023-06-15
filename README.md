@@ -283,3 +283,6 @@ resource "aws_sfn_state_machine" "MyStateMachine" {
 EOF
 }
 ```
+## STAGE 3 - FINISH
+At this point we have configured the state machine which is the core part of the serverless application.  
+The state machine controls the flow through the application and is responsible for interacting with other AWS products and services.  
