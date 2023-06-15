@@ -13,8 +13,15 @@ This project consists of 6 stages :
 - STAGE 8 : Test functionality
 - STAGE 9 : Cleanup the account
 
-Before starting, we need to be sure that we are logged into an AWS account, have admin privileges and are in the `us-east-1` / `N. Virginia` Region
-
+Before starting, we need to be sure that we are logged into an AWS account, have admin privileges and are in the `us-east-1` / `N. Virginia` Region.
+Here is terraform code
+```terraform
+provider "aws" {
+  region = "us-east-1"
+  access_key = "Access_Key_Example"
+  secret_key = "Secret_Key_Example"
+}
+```
 
 # STAGE 1 - Configure Simple Email service (SES)
 The Gym Instructions application is going to send reminder messages via Email. It will use the simple email service or SES. In production, it will be configured to allow sending from the application email, to any users of the application.  
@@ -23,13 +30,7 @@ For our application email:
 - the email the app (used by the trainer) will send from is going to be `moomenabid97+trainer@gmail.com`
 - the email for the customer (used by the trainee) is  `moomenabid97+trainee@gmail.com` 
 
-```terraform
-provider "aws" {
-  region = "us-east-1"
-  access_key = "Access_Key_Example"
-  secret_key = "Secret_Key_Example"
-}
-```
+
 
 
 
