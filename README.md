@@ -1,5 +1,7 @@
 # AWS Serverless Application
-In this project we are going to implement a simple serverless application using S3, API Gateway, Lambda, Step Functions and SES.
+In this project we are going to implement a simple serverless application using S3, API Gateway, Lambda, Step Functions and SES.  
+The serverless application has been created mainly using aws and python.
+The serverless application has been automated using Terraform.
 The goal of the serverless application is to enable our trainer to send us training instructions in order to guide us through our muscle gaining journey.
 
 This project consists of 6 stages :
@@ -14,7 +16,7 @@ This project consists of 6 stages :
 - STAGE 9 : Cleanup the account
 
 Before starting, we need to be sure that we are logged into an AWS account, have admin privileges and are in the `us-east-1` / `N. Virginia` Region.  
-Here is terraform code
+Here is the terraform code
 ```terraform
 provider "aws" {
   region = "us-east-1"
@@ -30,7 +32,16 @@ For our application email:
 - the email the app (used by the trainer) will send from is going to be `moomenabid97+trainer@gmail.com`
 - the email for the customer (used by the trainee) is  `moomenabid97+trainee@gmail.com` 
 
+```terraform
+#1 mail creation
+resource "aws_ses_email_identity" "moomenabid97trainer" {
+  email = "moomenabid97+trainer@gmail.com"
+}
 
+resource "aws_ses_email_identity" "moomenabid97trainee" {
+  email = "moomenabid97+trainee@gmail.com"
+}
+```
 
 
 
