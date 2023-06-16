@@ -1,8 +1,8 @@
 #0 connect to aws account
 provider "aws" {
   region = "us-east-1"
-  access_key = "AKIAUTPMHOVVBUFSYGF6"
-  secret_key = "IH81X3QjIJYRjJTUw3FWoskRteJKuo/LcrC84OLY"
+  access_key = "Access_Key_Example"
+  secret_key = "Secret_Key_Example"
 }
 
 #1 Create execution role for the lamda function
