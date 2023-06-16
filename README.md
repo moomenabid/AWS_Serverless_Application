@@ -47,7 +47,7 @@ resource "aws_ses_email_identity" "moomenabid97trainee" {
 ```
 # STAGE 2 : Add a email lambda function to use SES to send emails for the serverless application
 ## Architecture of STAGE 2
-<img src="https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/685b50cc-2ab8-4181-93d1-3d1a27ddbdbc" width=50% height=50%>
+<img src="https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/685b50cc-2ab8-4181-93d1-3d1a27ddbdbc" width=75% height=75%>
 
 ## STAGE 2A - Create the Lambda Execution Role for Lambda
 In this stage, we need to create an IAM role which the email_reminder_lambda function will use to interact with other AWS services.
@@ -175,7 +175,7 @@ resource "aws_lambda_function" "email_reminder_lambda" {
 At this point you have configured the lambda function which will be used eventually to send emails on behalf of the serverless application. 
 # STAGE 3 : Implement and configure the state machine, the core of the application
 ## Architecture of STAGE 3
-<img src="https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/c38e9254-1134-4438-821f-7095cd6d3e2a" width=50% height=50%>
+<img src="https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/c38e9254-1134-4438-821f-7095cd6d3e2a" width=75% height=75%>
 
 ## STAGE 3A - Create the state machine's role
 In this stage we need to create an IAM role which the state machine will use to interact with other AWS services.  
@@ -298,7 +298,7 @@ The state machine controls the flow through the application and is responsible f
 
 # STAGE 4 : Implement the supporting lambda function for the API Gateway
 ## Architecture of STAGE 4-5
-<img src="https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/56fec8c9-20e5-42ce-9967-816261281f4d" width=50% height=50%>
+<img src="https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/56fec8c9-20e5-42ce-9967-816261281f4d" width=75% height=75%>
 
 From now on, we will be creating the front end API for the serverless application.  
 The front end loads from S3, runs in a browser and communicates with this API.  
@@ -434,7 +434,7 @@ In STAGES 6 and 7, we will configure the client side of the application (loaded 
 
 # STAGE 6 : Implement the static frontend application and test functionality
 ## Architecture of STAGE 6
-<img src="https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/68ab9ef4-69db-4325-83e2-281a133554d0" width=50% height=50%>
+<img src="https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/68ab9ef4-69db-4325-83e2-281a133554d0" width=75% height=75%>
 
 In this stage of the application we will create an S3 bucket and static website hosting which will host the application front end.  
 We will download the source files for the front end, configure them to connect to your specific API gateway and then upload them to S3.
