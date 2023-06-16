@@ -355,6 +355,7 @@ def lambda_handler(event, context):
     return response
 ```
 This is the lambda function which will support the API Gateway  
+This is the function which will provide compute to API Gateway.  
 It's job is to be called by API Gateway when its used by the serverless front end part of the application (loaded by S3), It accepts some information from you, via API Gateway and then it starts a state machine execution - which is the logic of the application.
 
 Finally, we deployed the function, then we downloaded it's zip package `api_lambda.zip` and finally we deleted it because we will be creating it automatically with terraform using the downloaded zip package.
@@ -373,5 +374,13 @@ resource "aws_lambda_function" "api_lambda" {
 }
 ```
 # STAGE 5 : Create the API Gateway
-
-
+Now we have the api_lambda function created, the next step is to create the API Gateway, API and Method which the front end part of the serverless application will communicate with.
+## STAGE 5A : Create the API Gateway
+In order to do so we need to:
+- Move to the API Gateway console https://console.aws.amazon.com/apigateway/main/apis?region=us-east-1  
+- Click `APIs` on the menu on the left  
+- Locate the `REST API` box, and click `Build` (being careful not to click the build button for any of the other types of API ... REST API is the one you need)
+- If you see a popup dialog `Create your first API` dismiss it by clicking `OK`  
+- Under `Create new API` ensure `New API` is selected, For `API name*` enter `gyminstructions`, for `Endpoint Type` pick `Regional`, Click `create API` 
+## STAGE 5B : Create the resource
+In order to do so we need to:
