@@ -383,3 +383,39 @@ In order to do so we need to:
 - Under `Create new API` ensure `New API` is selected, For `API name*` enter `gyminstructions`, for `Endpoint Type` pick `Regional`, Click `create API` 
 ## STAGE 5B : Create the resource
 In order to do so we need to:
+- Click the Actions dropdown and Click Create Resource
+- Under resource name, enter gyminstructions
+- Click Create Resource
+## STAGE 5C : Create the method
+In order to do so we need to:  
+Ensure we have the `/gyminstructions` resource selected, click `Actions` dropdown and click `create method`  
+In the small dropdown box which appears below `/gyminstructions` select `POST` and click the `tick` symbol next to it.  
+this method is what the front end part of the application will make calls to.  
+Its what the api_lambda will provide services for. 
+
+we then:
+Ensure for `Integration Type` that `Lambda Function` is selected.  
+Make sure `us-east-1` is selected for `Lambda Region`  
+In the `Lambda Function` box, type `api_lambda`, click `Save`  
+
+## STAGE 5D - DEPLOY API  
+
+Now the API, Resource and Method are configured - we now need to deploy the API out to API gateway, specifically an API Gateway STAGE.  
+Here is how we do it:
+Click `Actions` Dropdown and `Deploy API`  
+For `Deployment Stage` select `New Stage`  
+for stage name and stage description enter `prod`  
+Click `Deploy`  
+
+At the top of the screen will be an `Invoke URL`, we will need it in the next STAGE.  
+This URL will be used by the client side component of the serverless application.    
+## STAGE 5 - Finish
+At this point we have configured the last part of the AWS side of the serveless application.   
+We now have :-
+
+- SES Configured
+- An Email Lambda function to send email using SES
+- A State Machine configured which can send EMAIL after a certain time period when invoked.
+- An API, Resource & Method, which use a lambda function for backing deployed out to the PROD stage of API Gateway
+
+In STAGES 6 and 7, we will configure the client side of the application (loaded from S3, running in a browser) so that it communicates to API Gateway.  
