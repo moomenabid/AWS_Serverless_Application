@@ -379,8 +379,7 @@ Now we have the api_lambda function created, the next step is to create the API 
 In order to do so we need to:
 - Move to the API Gateway console https://console.aws.amazon.com/apigateway/main/apis?region=us-east-1  
 - Click `APIs` on the menu on the left  
-- Locate the `REST API` box, and click `Build` (being careful not to click the build button for any of the other types of API ... REST API is the one you need)
-- If you see a popup dialog `Create your first API` dismiss it by clicking `OK`  
+- Locate the `REST API` box, and click `Build`  
 - Under `Create new API` ensure `New API` is selected, For `API name*` enter `gyminstructions`, for `Endpoint Type` pick `Regional`, Click `create API` 
 ## STAGE 5B : Create the resource
 In order to do so we need to:
