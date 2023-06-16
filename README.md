@@ -165,7 +165,7 @@ resource "aws_lambda_function" "email_reminder_lambda" {
   runtime = "python3.9"
 }
 ```
-## STAGE 2 - Finish   
+## STAGE 2D - Finish   
 At this point you have configured the lambda function which will be used eventually to send emails on behalf of the serverless application. 
 # STAGE 3 : Implement and configure the state machine, the core of the application
 ## STAGE 3A - Create the state machine's role
@@ -283,7 +283,7 @@ resource "aws_sfn_state_machine" "MyStateMachine" {
 EOF
 }
 ```
-## STAGE 3 - FINISH
+## STAGE 3C - FINISH
 At this point we have configured the state machine which is the core part of the serverless application.  
 The state machine controls the flow through the application and is responsible for interacting with other AWS products and services.  
 
@@ -409,7 +409,7 @@ Click `Deploy`
 
 At the top of the screen will be an `Invoke URL`, we will need it in the next STAGE.  
 This URL will be used by the client side component of the serverless application.    
-## STAGE 5 - Finish
+## STAGE 5E - Finish
 At this point we have configured the last part of the AWS side of the serveless application.   
 We now have :-
 
