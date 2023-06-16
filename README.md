@@ -10,17 +10,16 @@ This project consists of 6 stages :
 - STAGE 3 : Implement and configure the state machine, the core of the application
 - STAGE 4 : Implement the supporting lambda function for the API Gateway
 - STAGE 5 : Create the API Gateway  
-- STAGE 6 : Implement the S3 bucket 
-- STAGE 7 : Import the static frontend application to the S3 bucket
-- STAGE 8 : Test functionality
-- STAGE 9 : Cleanup the account
+- STAGE 6 : Implement the static frontend application and test functionality
+- STAGE 7 : Cleanup the account
 
-Before starting, we need to be sure that we are logged into an AWS account, have admin privileges and are in the `us-east-1` / `N. Virginia` Region.  
-Here is the terraform code
+
+Before starting, we need to be sure that we have terraform installed in our local machine, we are logged into an AWS account, have admin privileges (we need to donwload the corresponding access_key and secret_key and use them within our terraform code) and are in the `us-east-1` / `N. Virginia` Region.  
+Here is the corresponding terraform code
 ```terraform
 provider "aws" {
   region = "us-east-1"
-  access_key = "Access_Key_Example"
+  access_key = "Access_Key_Example" # we cannot expose our access key and secret key for security reasons
   secret_key = "Secret_Key_Example"
 }
 ```
@@ -419,3 +418,167 @@ We now have :-
 - An API, Resource & Method, which use a lambda function for backing deployed out to the PROD stage of API Gateway
 
 In STAGES 6 and 7, we will configure the client side of the application (loaded from S3, running in a browser) so that it communicates to API Gateway.  
+
+# STAGE 6 : Implement the static frontend application and test functionality
+In this stage of the application we will create an S3 bucket and static website hosting which will host the application front end.  
+We will download the source files for the front end, configure them to connect to your specific API gateway and then upload them to S3.
+Finally, we will run some application tests to verify its functionality. 
+## STAGE 6A - Create the S3 bucket
+We createthe S3 bucket by applying the following terraform code
+```terraform
+#5 Implementing the client-side application
+
+#### Create the S3 bucket
+resource "aws_s3_bucket" "gyminstructions789789" {
+  bucket = "gyminstructions789789"
+  #block public access option will be unticked
+}
+```
+Then, and in order to make the S3 bucket public, we need to **UNTICK** the option `Block all public access` available in the S3 console  
+We do this via the following terraform code
+```terraform
+#### Making the S3 bucket publically accessible via a bucket policy and via removing the option block all public access
+resource "aws_s3_bucket_public_access_block" "remove_block_all_public_access" {
+  bucket = aws_s3_bucket.gyminstructions789789.id
+  ## The following options will have these default values
+  #block_public_acls       = false
+  #block_public_policy     = false
+  #ignore_public_acls      = false
+  #restrict_public_buckets = false
+}
+```
+## STAGE 6B - Set the S3 bucket as public
+In order to make the S3 bucket public, we need to associate a `bucket policy` to it  
+We do it by applying the following terraform code
+```terraform
+resource "aws_s3_bucket_policy" "allow_public_access" {
+  bucket = aws_s3_bucket.gyminstructions789789.id
+  policy = data.aws_iam_policy_document.allow_public_access.json
+}
+
+data "aws_iam_policy_document" "allow_public_access" {
+  statement {
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.gyminstructions789789.arn}/*",
+    ]
+  }
+}
+```
+## STAGE 6C - Enable Static Hosting
+Next we need to enable static hosting on the S3 bucket so that it can be used as a front end website.  
+We do it by applying the following terraform code
+```terraform
+#### Enabling static website hosting for the S3 bucket
+resource "aws_s3_bucket_website_configuration" "allow_static_website_hosting" {
+  bucket = aws_s3_bucket.gyminstructions789789.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "index.html"
+  }
+
+}
+```
+At this point we can access the bucket URL under the `Properties Tab`, under `Bucket Website Endpoint`  
+
+## STAGE 6D - Download and edit the front end files
+Inside the serverless_frontend folder in this repository are the front end files for the serverless website :
+
+- index.html .. the main index page
+- main.css .. the stylesheet for the page
+- personal_trainer.png .. an image of of the trainer
+- serverless.js .. the JS code which runs in a browser. It responds when buttons are clicked, and passes and text from the boxes when it calls the API Gateway endpoint. 
+
+Then we need to:  
+Open the `serverless.js` in a code/text editor.
+Locate the placeholder `REPLACEME_API_GATEWAY_INVOKE_URL` . replace it with your API Gateway Invoke URL
+at the end of this URL.. add `/gyminstructions`
+it should look something like this `https://somethingsomething.execute-api.us-east-1.amazonaws.com/prod/gyminstructions` 
+Save the file.  
+## STAGE 6E - Upload and test
+In order to do this, we need to:  
+Return to the S3 console
+Click on the `Objects` Tab.  
+Click `Upload`  
+Drag the 4 files from the serverless_frontend folder onto this tab, including the serverless.js file we just edited.  
+Click `Upload` and wait for it to complete.  
+
+Then, we:  
+Open the `GymInstructions URL` we just noted down in a new tab. 
+What we are seeing is a simple HTML web page created by the HTML file itself and the `main.css` stylesheet.
+When we click buttons .. that calls the `.js` file which is the starting point for the serverless application
+
+Ok to test the application we:  
+Enter an amount of time to wait for before sending the next instruction ... for example `120` seconds
+Enter a message, for example `do 100 push ups`  
+then enter the `trainee Address` in the email box, this is the email which we verified right at the start as the customer for this application which is moomenabid97+trainee@gmail.com  
+**before we do the next step and click the button on the application, if we want to see how the application works we do the following**
+open a new tab to the `Step functions console` https://console.aws.amazon.com/states/home?region=us-east-1#/statemachines  
+Click on `gyminstructions`  
+Click on the `Logging` tab, we will see no logs
+CLick on the `Executions` tab, we will see no executions..
+
+we move back to the web application tab (s3 bucket)  
+then click on `Email Trainee` Button to send an email.  
+
+In order to see executions, here is what we we will do:  
+Got back to the Step functions console
+make sure the `Executions` Tab is selected
+click the `Refresh` Icon
+Click the `execution`  
+Watch the graphic .. see how the `Timer state` is highlighted
+The step function is now executing and it has its own state ... its a serverless flow.
+If we Keep waiting, and after 120 seconds the visual will update showing the flow through the state machine  
+
+- Timer .. waits 120 seconds
+- `Email` invokes the lambda function to send an email
+- `NextState` in then moved through, then finally `END`
+
+If we scroll to the top, click `ExeuctionInput` and we can see the information entered on the webpage.
+This was send it, via the `JS` running in browser, to the API gateway, to the `api_lambda` then through to the `statemachine`  
+
+If we click `gyminstructions` at the top of the page  
+Click on the `Logging` Tab  
+Because the roles we created had `CWLogs` permissions the state machine is able to log to CWLogs
+Review the logs and ensure we are happy with the flow.  
+## STAGE 6F - Finish
+At this point thats everything .. we now have a fully functional serverless application that does the following
+
+- Loads HTML & JS From S3 & Static hosting
+- Communicates via `JS` to API Gateway 
+- uses `api_lambda` as backing resource
+- runs a statemachine passing in parameters
+- state machine sends email
+- state machine terminates
+
+No servers were harmed, or used even, in this production 
+
+Thats everything for this project, in the next and final stage STAGE7 we will clear up all of the services used for this project.  
+## STAGE 7 - Cleanup the account
+In this stage you will cleanup all the resources created by this project  
+To do this, we need to:  
+
+Move to the S3 console https://s3.console.aws.amazon.com/s3/home?region=us-east-1 Select the bucket we created
+Click Empty, type or copy/paste the bucket name and click Empty, Click Exit
+
+Move to the API Gateway console https://console.aws.amazon.com/apigateway/main/apis?region=us-east-1
+Check the box next to the petcuddleotron API
+Click Actions and then Delete
+Click Delete
+
+Then we need to go into each of the directories named terraform_script_email_identities and terraform_script_serverless_application_backend and execute the following command
+```powershell
+terraform destroy -auto-approve
+```
