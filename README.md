@@ -25,7 +25,7 @@ provider "aws" {
 ```
 
 # STAGE 1 - Configure Simple Email service (SES)
-![ARCHITECTURE-STAGE1](https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/8013befa-6ee2-4737-93f4-8c83b7a7f00c)
+#![ARCHITECTURE-STAGE1](https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/8013befa-6ee2-4737-93f4-8c83b7a7f00c)
 <img src="https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/8013befa-6ee2-4737-93f4-8c83b7a7f00c" width=50% height=50%>
 
 The Gym Instructions application is going to send reminder messages via Email. It will use the simple email service or SES. In production, it will be configured to allow sending from the application email, to any users of the application.  
