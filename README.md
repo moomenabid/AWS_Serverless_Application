@@ -27,7 +27,6 @@ provider "aws" {
 # STAGE 1 - Configure Simple Email service (SES)
 <!--- ![ARCHITECTURE-STAGE1](https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/8013befa-6ee2-4737-93f4-8c83b7a7f00c) --->
 <img src="https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/8013befa-6ee2-4737-93f4-8c83b7a7f00c" width=50% height=50% title="Optional title">
-*image_caption*
 <p>
     <img src="https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/8013befa-6ee2-4737-93f4-8c83b7a7f00c" width=50% height=50% alt>
     <em>image_caption</em>
