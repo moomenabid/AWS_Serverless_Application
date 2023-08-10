@@ -172,7 +172,7 @@ resource "aws_lambda_function" "email_reminder_lambda" {
 }
 ```
 ## STAGE 2D - Finish   
-At this point you have configured the lambda function which will be used eventually to send emails on behalf of the serverless application. 
+At this point we have configured the lambda function which will be used eventually to send emails on behalf of the serverless application. 
 # STAGE 3 : Implement and configure the state machine, the core of the application
 ## Architecture of STAGE 3
 <img src="https://github.com/moomenabid/AWS_Serverless_Application/assets/47564307/c38e9254-1134-4438-821f-7095cd6d3e2a" width=75% height=75%>
