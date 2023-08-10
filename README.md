@@ -112,7 +112,7 @@ This role is what gives lambda the permissions to interact with those services.
 Next we are going to create the lambda function which will be used by the serverless application to create an email and then send it using `SES`
 
 ## STAGE 2B - Create the python zip package to be executed by the email_reminder_lambda function
-First, we need tp create the python zip package to be executed by the email_reminder_lambda function  
+First, we need to create the python zip package to be executed by the email_reminder_lambda function  
 We need to do this step manually, we will afterwards download the zip package and use to create the lambda function automatically with terraform.
 
 In order to do so, we need to:  
