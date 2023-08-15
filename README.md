@@ -535,7 +535,7 @@ Drag the 4 files from the serverless_frontend folder onto this tab, including th
 Click `Upload` and wait for it to complete.  
 
 Then, we:  
-Open the `GymInstructions URL` we just noted down in a new tab. 
+Open the `GymInstructions URL` that we can access via the `Properties Tab` of the bucket, under `Bucket Website Endpoint` . 
 What we are seeing is a simple HTML web page created by the HTML file itself and the `main.css` stylesheet.
 When we click buttons .. that calls the `.js` file which is the starting point for the serverless application
 
