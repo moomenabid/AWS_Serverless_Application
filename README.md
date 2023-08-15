@@ -406,7 +406,7 @@ In the small dropdown box which appears below `/gyminstructions` select `POST` a
 this method is what the front end part of the application will make calls to.  
 Its what the api_lambda will provide services for. 
 
-we then:
+we then:  
 Ensure for `Integration Type` that `Lambda Function` is selected.  
 Make sure `us-east-1` is selected for `Lambda Region`  
 In the `Lambda Function` box, type `api_lambda`, click `Save`  
