@@ -398,6 +398,7 @@ In order to do so we need to:
 - Click the Actions dropdown and Click Create Resource
 - Under resource name, enter gyminstructions
 - Click Create Resource
+- TICK Enable API Gateway CORS
 ## STAGE 5C : Create the method
 In order to do so we need to:  
 Ensure we have the `/gyminstructions` resource selected, click `Actions` dropdown and click `create method`  
