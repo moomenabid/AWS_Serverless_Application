@@ -409,8 +409,9 @@ Its what the api_lambda will provide services for.
 we then:  
 Ensure for `Integration Type` that `Lambda Function` is selected.  
 Make sure `us-east-1` is selected for `Lambda Region`  
-In the `Lambda Function` box, type `api_lambda`, click `Save`  
-Tick Use Lambda Proxy integration
+In the `Lambda Function` box, type `api_lambda`  
+Tick Use Lambda Proxy integration  
+click `Save` 
 
 ## STAGE 5D - DEPLOY API  
 
